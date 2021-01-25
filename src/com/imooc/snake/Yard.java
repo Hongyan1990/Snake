@@ -1,6 +1,7 @@
 package com.imooc.snake;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -13,10 +14,13 @@ public class Yard extends Frame {
 	public static final int ROWS = 50;
 	public static final int COLS = 50;
 	public static final int SIZE = 10;
-	Snake snake = new Snake(this);
+	private int score = 0;
 	boolean gameOver = false;
-	PaintThread paintThread = new PaintThread();
 	
+	private Font gameOverFont = new Font("宋体", Font.BOLD, 50);
+	Snake snake = new Snake(this);
+	Egg e = new Egg();
+	PaintThread paintThread = new PaintThread();
 	Image offScreenImage = null;
 	
 	public void launch() {
@@ -63,7 +67,7 @@ public class Yard extends Frame {
 				repaint();
 				System.out.println("repaint");
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -87,8 +91,6 @@ public class Yard extends Frame {
 
 	@Override
 	public void paint(Graphics g) {
-		// TODO Auto-generated method stub
-		super.paint(g);
 		Color c = g.getColor();
 		g.setColor(Color.GRAY);
 		g.fillRect(0, 0, COLS * SIZE, ROWS * SIZE);
@@ -99,11 +101,18 @@ public class Yard extends Frame {
 		for(int i=1; i<ROWS; i++) {
 			g.drawLine(0, i*SIZE, COLS*SIZE, i*SIZE);
 		}
+		g.setColor(Color.YELLOW);
+		g.drawString("score: " + score, 10, 60);
 		if(this.gameOver) {
+			g.setFont(gameOverFont);
+			g.drawString("游戏结束 ", 100, 200);
 			System.out.println("游戏结束");
 			this.paintThread.pause();
 		} else {
+			snake.eat(e);
+			e.draw(g);
 			snake.draw(g);
+			
 		}
 		
 	}
@@ -111,8 +120,6 @@ public class Yard extends Frame {
 
 	@Override
 	public void update(Graphics g) {
-		// TODO Auto-generated method stub
-		super.update(g);
 		if(offScreenImage == null) {
 			offScreenImage = this.createImage(COLS*SIZE, ROWS*SIZE);
 		}
@@ -121,7 +128,15 @@ public class Yard extends Frame {
 		g.drawImage(offScreenImage, 0, 0, null);
 	}
 
+	
 
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
 
 	public static void main(String[] args) {
 		new Yard().launch();

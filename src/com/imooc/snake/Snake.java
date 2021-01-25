@@ -2,6 +2,7 @@ package com.imooc.snake;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 public class Snake {
@@ -27,20 +28,20 @@ public class Snake {
 		int key = e.getKeyCode();
 		switch(key) {
 		case  KeyEvent.VK_UP:
-			head.dir = Dir.U;
+			if(head.dir != Dir.D)
+				head.dir = Dir.U;
 			break;
 		case KeyEvent.VK_RIGHT:
-			head.dir = Dir.R;
+			if(head.dir != Dir.L)
+				head.dir = Dir.R;
 			break;
 		case KeyEvent.VK_DOWN:
-			head.dir = Dir.D;
+			if(head.dir != Dir.U)
+				head.dir = Dir.D;
 			break;
 		case KeyEvent.VK_LEFT:
-			head.dir = Dir.L;
-			break;
-		case KeyEvent.VK_SPACE:
-			System.out.println("add node");
-			addHead();
+			if(head.dir != Dir.R)
+				head.dir = Dir.L;
 			break;
 		}
 		
@@ -80,9 +81,21 @@ public class Snake {
 	public void checkDead() {
 		int row = head.row;
 		int col = head.col;
-		if(col>Yard.COLS-1 || row>Yard.ROWS-1 || col<1 || row<1) {
+		if(col>Yard.COLS-1 || row>Yard.ROWS-1 || col<1 || row<2) {
 			this.y.stopGame();
 		}
+	}
+	
+	public void eat(Egg e) {
+		if(this.getRectangle().intersects(e.getRectangle())) {
+			e.reAppear();
+			addHead();
+			y.setScore(y.getScore() + 5);
+		}
+	}
+	
+	public Rectangle getRectangle() {
+		return new Rectangle(head.row*Yard.SIZE, head.col*Yard.SIZE, head.w, head.h);
 	}
 	
 	private class Node {
